@@ -1,12 +1,23 @@
-# TODO: Fix 500 Internal Server Error in Checkout
+# Task: Refactor AllProductsImagesNavbar to Display Full Product Cards
 
 ## Steps to Complete:
-- [x] Add detailed error logging in backend/routes/checkout.js to capture exact error causing 500
-- [x] Add try-catch around product existence checks in checkout.js
-- [x] Verify frontend request payload format (product IDs) in CheckoutForm.js
-- [x] Update Product model to include id field
-- [x] Update seed data with id fields matching frontend
-- [x] Modify checkout route to find products by id and use _id in order
-- [x] Reseed products in database
-- [x] Start backend and frontend servers
-- [x] Test placing an order to confirm fix
+
+1. [ ] Edit frontend/src/components/AllProductsImagesNavbar.js:
+   - Add necessary imports for contexts and FaHeart.
+   - Add notification state and handlers for cart and wishlist.
+   - Update component to render a heading, notification, and grid of full product cards with large images, details, and buttons (matching category navbars).
+   - Remove unused imports and small thumbnail logic.
+
+2. [ ] Restart frontend server (`cd frontend && npm start`) to apply changes.
+
+3. [ ] Test in browser:
+   - Navigate to http://localhost:3000/products.
+   - Verify grid displays 30 full cards with large images (h-64, object-contain, hover scale).
+   - Test Add to Cart: Button works, shows green notification.
+   - Test Wishlist: Heart toggles (gray to red), integrates with context.
+   - Confirm no console errors; images load successfully.
+   - Check responsiveness (mobile: 2 cols, desktop: 4 cols).
+
+4. [ ] Update TODO.md to mark steps as completed.
+
+5. [ ] If issues, debug and iterate (e.g., check contexts, API fetch).
