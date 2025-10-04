@@ -19,17 +19,23 @@ router.post('/', async (req, res) => {
     const transformedItems = [];
     for (const item of items) {
       try {
-        console.log(`Finding product with id: ${item.product}`);
-        const product = await require('../models/Product').findOne({ id: item.product });
+        console.log(`Finding product with _id: ${item.product}`);
+        const mongoose = require('mongoose');
+        let product;
+        if (mongoose.Types.ObjectId.isValid(item.product)) {
+          product = await require('../models/Product').findOne({ _id: item.product });
+        } else {
+          product = await require('../models/Product').findOne({ id: item.product });
+        }
         if (!product) {
-          console.error(`Product not found for id: ${item.product}`);
+          console.error(`Product not found for _id or id: ${item.product}`);
           return res.status(400).json({ message: 'One or more products in your cart are no longer available. Please review your cart and try again.' });
         }
         transformedItems.push({
           product: product._id,
           quantity: item.quantity,
         });
-        console.log(`Product found: ${product._id} for id ${item.product}`);
+        console.log(`Product found: ${product._id} for _id or id ${item.product}`);
       } catch (findError) {
         console.error(`Error finding product ${item.product}:`, findError);
         return res.status(500).json({ message: 'There was an issue processing your order. Please try again later.' });
@@ -61,3 +67,5 @@ router.post('/', async (req, res) => {
 });
 
 module.exports = router;
+
+
