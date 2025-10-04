@@ -5,7 +5,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { FaHeart } from 'react-icons/fa';
 
 const AllProductsImagesNavbar = () => {
-  const { addItem } = useCart();
+  const { addItem, backendUrl } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [allProducts, setAllProducts] = useState([]);
   const [notification, setNotification] = useState('');
@@ -18,7 +18,7 @@ const AllProductsImagesNavbar = () => {
         const params = {};
         if (search) params.search = search;
         if (category) params.category = category;
-        const response = await axios.get('/api/products', { params });
+        const response = await axios.get(`${backendUrl}/api/products`, { params });
         console.log('Fetch successful. Response data:', response.data);
         console.log('Products with imageUrls:', response.data.map(p => ({ id: p.id, name: p.name, imageUrl: p.imageUrl })));
         setAllProducts(response.data);
@@ -30,7 +30,7 @@ const AllProductsImagesNavbar = () => {
     };
 
     fetchProducts();
-  }, [search, category]);
+  }, [search, category, backendUrl]);
 
   const handleAddToCart = (product) => {
     addItem({ id: product._id, name: product.name, price: product.price });
