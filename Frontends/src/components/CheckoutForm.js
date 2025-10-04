@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useCart } from '../context/CartContext';
 
 const CheckoutForm = () => {
-  const { cartItems, clearCart } = useCart();
+  const { cartItems, clearCart, backendUrl } = useCart();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
