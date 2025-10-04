@@ -6,6 +6,8 @@ const initialState = {
   cartItems: [],
 };
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
+
 function cartReducer(state, action) {
   switch (action.type) {
     case 'ADD_ITEM':
@@ -51,10 +53,11 @@ export const CartProvider = ({ children }) => {
   const clearCart = () => dispatch({ type: 'CLEAR_CART' });
 
   return (
-    <CartContext.Provider value={{ cartItems: state.cartItems, addItem, removeItem, updateQuantity, clearCart }}>
+    <CartContext.Provider value={{ cartItems: state.cartItems, addItem, removeItem, updateQuantity, clearCart, backendUrl }}>
       {children}
     </CartContext.Provider>
   );
 };
 
 export const useCart = () => useContext(CartContext);
+
