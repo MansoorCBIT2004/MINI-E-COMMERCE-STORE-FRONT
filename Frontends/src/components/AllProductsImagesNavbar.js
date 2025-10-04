@@ -18,7 +18,9 @@ const AllProductsImagesNavbar = () => {
         const params = {};
         if (search) params.search = search;
         if (category) params.category = category;
-        const response = await axios.get(`${backendUrl}/api/products`, { params });
+        // Use relative URL if backendUrl is empty
+        const baseUrl = backendUrl ? backendUrl : '';
+        const response = await axios.get(`${baseUrl}/api/products`, { params });
         console.log('Fetch successful. Response data:', response.data);
         console.log('Products with imageUrls:', response.data.map(p => ({ id: p.id, name: p.name, imageUrl: p.imageUrl })));
         setAllProducts(response.data);
@@ -33,7 +35,8 @@ const AllProductsImagesNavbar = () => {
   }, [search, category, backendUrl]);
 
   const handleAddToCart = (product) => {
-    addItem({ id: product._id, name: product.name, price: product.price });
+    // Use product.id instead of product._id for consistency with backend
+    addItem({ id: product.id, name: product.name, price: product.price });
     setNotification(`${product.name} is added to cart`);
     setTimeout(() => {
       setNotification('');
@@ -41,10 +44,10 @@ const AllProductsImagesNavbar = () => {
   };
 
   const handleWishlistToggle = (product) => {
-    if (isInWishlist(product._id)) {
-      removeFromWishlist(product._id);
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
     } else {
-      addToWishlist({ id: product._id, name: product.name, price: product.price, imageUrl: product.imageUrl });
+      addToWishlist({ id: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl });
     }
   };
 
@@ -80,17 +83,20 @@ const AllProductsImagesNavbar = () => {
           <p className="col-span-full text-center text-gray-500">No products found for the selected category.</p>
         ) : (
           allProducts.map((product) => (
-            <div key={product._id} className="bg-white rounded shadow transition-all duration-300 flex flex-col relative">
+            <div key={product.id} className="bg-white rounded shadow transition-all duration-300 flex flex-col relative">
               <div className="relative w-full bg-white rounded mx-auto mb-2 overflow-hidden transition-all duration-300">
                 <img 
                   src={product.imageUrl || 'https://via.placeholder.com/300'} 
                   alt={product.name} 
                   className="w-full h-64 object-contain rounded hover:scale-105 transition-transform duration-300"
                   onError={(e) => {
-                    console.error(`Failed to load image for product ID ${product._id} with URL: ${e.target.src}`);
+                    console.error(`Failed to load image for product ID ${product.id} with URL: ${e.target.src}`);
                     e.target.src = 'https://via.placeholder.com/300';
+                    alert(`Image failed to load for product ${product.name} with URL: ${product.imageUrl}`);
                   }}
-                  onLoad={() => console.log(`Successfully loaded image for product ID ${product._id}`)}
+                  onLoad={() => {
+                    console.log(`Successfully loaded image for product ID ${product.id} with URL: ${product.imageUrl}`);
+                  }}
                 />
               </div>
               <div className="self-end p-1">
@@ -98,7 +104,7 @@ const AllProductsImagesNavbar = () => {
                   onClick={() => handleWishlistToggle(product)}
                   className="bg-white rounded-full p-1 shadow-md"
                 >
-                  <FaHeart size={20} className={isInWishlist(product._id) ? 'fill-current text-red-500' : 'text-gray-400'} />
+                  <FaHeart size={20} className={isInWishlist(product.id) ? 'fill-current text-red-500' : 'text-gray-400'} />
                 </button>
               </div>
               <div className="p-2 flex flex-col flex-1 justify-between">
