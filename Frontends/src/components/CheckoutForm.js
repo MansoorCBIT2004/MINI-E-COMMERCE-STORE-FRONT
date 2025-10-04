@@ -39,7 +39,7 @@ const CheckoutForm = () => {
     console.log('Submitting order:', { userId: null, items, totalAmount });
 
     try {
-      const response = await axios.post('/api/checkout', {
+      const response = await axios.post(`${backendUrl}/api/checkout`, {
         userId: null,
         items,
         totalAmount,
@@ -120,3 +120,5 @@ const CheckoutForm = () => {
 };
 
 export default CheckoutForm;
+
+
