@@ -13,9 +13,11 @@ const AllProductsImagesNavbar = () => {
   const [category, setCategory] = useState('');
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const fetchProducts = async (reset = false) => {
     try {
+      setLoading(true);
       const params = {};
       if (search) params.search = search;
       if (category) params.category = category;
@@ -31,12 +33,14 @@ const AllProductsImagesNavbar = () => {
         setAllProducts(prev => [...prev, ...response.data]);
         setHasMore(response.data.length === 10);
       }
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching products:', error);
       if (reset) {
         setAllProducts([]);
         setHasMore(false);
       }
+      setLoading(false);
     }
   };
 
@@ -106,7 +110,9 @@ const AllProductsImagesNavbar = () => {
         </select>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {allProducts.length === 0 ? (
+        {loading ? (
+          <p className="col-span-full text-center text-gray-500">Loading products...</p>
+        ) : allProducts.length === 0 ? (
           <p className="col-span-full text-center text-gray-500">No products found for the selected category.</p>
         ) : (
           allProducts.map((product) => {
@@ -151,7 +157,7 @@ const AllProductsImagesNavbar = () => {
           })
         )}
       </div>
-      {hasMore && (
+      {hasMore && allProducts.length > 0 && !loading && (
         <div className="text-center mt-4">
           <button
             onClick={handleLoadMore}
