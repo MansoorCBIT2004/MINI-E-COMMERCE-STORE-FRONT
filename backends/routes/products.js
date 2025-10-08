@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 
-// GET /products?search=&category=
+// GET /products?search=&category=&limit=&skip=
 router.get('/', async (req, res) => {
   try {
-    const { search, category } = req.query;
+    const { search, category, limit, skip } = req.query;
     let filter = {};
 
     if (search) {
@@ -15,7 +15,9 @@ router.get('/', async (req, res) => {
       filter.category = category;
     }
 
-    const products = await Product.find(filter);
+    const products = await Product.find(filter)
+      .skip(skip ? parseInt(skip) : 0)
+      .limit(limit ? parseInt(limit) : 0);
     res.json(products);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
@@ -23,3 +25,5 @@ router.get('/', async (req, res) => {
 });
 
 module.exports = router;
+
+
