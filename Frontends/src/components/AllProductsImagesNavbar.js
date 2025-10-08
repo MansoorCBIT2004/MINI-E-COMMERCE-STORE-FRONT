@@ -11,27 +11,37 @@ const AllProductsImagesNavbar = () => {
   const [notification, setNotification] = useState('');
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+
+  const fetchProducts = async (reset = false) => {
+    try {
+      const params = {};
+      if (search) params.search = search;
+      if (category) params.category = category;
+      params.limit = 10;
+      params.skip = reset ? 0 : page * 10;
+      const baseUrl = backendUrl ? backendUrl : '';
+      const response = await axios.get(`${baseUrl}/api/products`, { params });
+      if (reset) {
+        setAllProducts(response.data);
+        setPage(0);
+        setHasMore(response.data.length === 10);
+      } else {
+        setAllProducts(prev => [...prev, ...response.data]);
+        setHasMore(response.data.length === 10);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      if (reset) {
+        setAllProducts([]);
+        setHasMore(false);
+      }
+    }
+  };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const params = {};
-        if (search) params.search = search;
-        if (category) params.category = category;
-        // Use relative URL if backendUrl is empty
-        const baseUrl = backendUrl ? backendUrl : '';
-        const response = await axios.get(`${baseUrl}/api/products`, { params });
-        console.log('Fetch successful. Response data:', response.data);
-        console.log('Products with imageUrls:', response.data.map(p => ({ id: p.id, name: p.name, imageUrl: p.imageUrl })));
-        setAllProducts(response.data);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        console.error('Error details:', error.response || error.message);
-        setAllProducts([]); // Set empty array on error
-      }
-    };
-
-    fetchProducts();
+    fetchProducts(true);
   }, [search, category, backendUrl]);
 
   const handleAddToCart = (product) => {
@@ -49,6 +59,23 @@ const AllProductsImagesNavbar = () => {
     } else {
       addToWishlist({ id: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl });
     }
+  };
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    const params = {};
+    if (search) params.search = search;
+    if (category) params.category = category;
+    params.limit = 10;
+    params.skip = nextPage * 10;
+    const baseUrl = backendUrl ? backendUrl : '';
+    axios.get(`${baseUrl}/api/products`, { params }).then(response => {
+      setAllProducts(prev => [...prev, ...response.data]);
+      setPage(nextPage);
+      setHasMore(response.data.length === 10);
+    }).catch(error => {
+      console.error('Error loading more products:', error);
+    });
   };
 
   return (
@@ -124,10 +151,18 @@ const AllProductsImagesNavbar = () => {
           })
         )}
       </div>
+      {hasMore && (
+        <div className="text-center mt-4">
+          <button
+            onClick={handleLoadMore}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Load More
+          </button>
+        </div>
+      )}
     </div>
   );
 };
 
 export default AllProductsImagesNavbar;
-
-
