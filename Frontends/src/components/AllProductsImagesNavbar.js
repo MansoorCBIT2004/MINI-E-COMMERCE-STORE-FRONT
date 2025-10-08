@@ -82,40 +82,46 @@ const AllProductsImagesNavbar = () => {
         {allProducts.length === 0 ? (
           <p className="col-span-full text-center text-gray-500">No products found for the selected category.</p>
         ) : (
-          allProducts.map((product) => (
-            <div key={product.id} className="bg-white rounded shadow transition-all duration-300 flex flex-col relative">
-              <div className="relative w-full bg-white rounded mx-auto mb-2 overflow-hidden transition-all duration-300">
-                <img 
-                  src={product.imageUrl || 'https://via.placeholder.com/300'} 
-                  alt={product.name} 
-                  className="w-full h-64 object-contain rounded hover:scale-105 transition-transform duration-300"
-                  onError={(e) => {
-                    console.error(`Failed to load image for product ID ${product.id} with URL: ${e.target.src}`);
-                    e.target.src = 'https://via.placeholder.com/300';
-                    alert(`Image failed to load for product ${product.name} with URL: ${product.imageUrl}`);
-                  }}
-                  onLoad={() => {
-                    console.log(`Successfully loaded image for product ID ${product.id} with URL: ${product.imageUrl}`);
-                  }}
-                />
-              </div>
-              <div className="self-end p-1">
-                <button
-                  onClick={() => handleWishlistToggle(product)}
-                  className="bg-white rounded-full p-1 shadow-md"
-                >
-                  <FaHeart size={20} className={isInWishlist(product.id) ? 'fill-current text-red-500' : 'text-gray-400'} />
-                </button>
-              </div>
-              <div className="p-2 flex flex-col flex-1 justify-between">
-                <div>
-                  <h3 className="font-bold text-lg text-center mb-1">{product.name}</h3>
-                  <p className="font-semibold text-center text-blue-600 text-sm">${product.price.toFixed(2)}</p>
-                  <p className="text-xs text-center text-gray-500 mb-2">Stock: {product.stock || 0}</p>
+          allProducts.map((product) => {
+            const optimizedImageUrl = product.imageUrl
+              ? product.imageUrl.replace('/upload/', '/upload/w_300,h_256,c_fit,f_auto,q_auto/')
+              : 'https://via.placeholder.com/300';
+            return (
+              <div key={product.id} className="bg-white rounded shadow transition-all duration-300 flex flex-col relative">
+                <div className="relative w-full bg-white rounded mx-auto mb-2 overflow-hidden transition-all duration-300">
+                  <img
+                    src={optimizedImageUrl}
+                    alt={product.name}
+                    className="w-full h-64 object-contain rounded hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                    onError={(e) => {
+                      console.error(`Failed to load image for product ID ${product.id} with URL: ${e.target.src}`);
+                      e.target.src = 'https://via.placeholder.com/300';
+                      alert(`Image failed to load for product ${product.name} with URL: ${product.imageUrl}`);
+                    }}
+                    onLoad={() => {
+                      console.log(`Successfully loaded image for product ID ${product.id} with URL: ${product.imageUrl}`);
+                    }}
+                  />
+                </div>
+                <div className="self-end p-1">
+                  <button
+                    onClick={() => handleWishlistToggle(product)}
+                    className="bg-white rounded-full p-1 shadow-md"
+                  >
+                    <FaHeart size={20} className={isInWishlist(product.id) ? 'fill-current text-red-500' : 'text-gray-400'} />
+                  </button>
+                </div>
+                <div className="p-2 flex flex-col flex-1 justify-between">
+                  <div>
+                    <h3 className="font-bold text-lg text-center mb-1">{product.name}</h3>
+                    <p className="font-semibold text-center text-blue-600 text-sm">${product.price.toFixed(2)}</p>
+                    <p className="text-xs text-center text-gray-500 mb-2">Stock: {product.stock || 0}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
@@ -123,3 +129,5 @@ const AllProductsImagesNavbar = () => {
 };
 
 export default AllProductsImagesNavbar;
+
+
